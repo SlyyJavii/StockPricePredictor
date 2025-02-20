@@ -1,0 +1,8 @@
+#ignore vitural environment
+venv310/
+
+#python cache
+__pycache__/
+
+#ignore ds store
+.DS_Store
