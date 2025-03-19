@@ -8,8 +8,8 @@ from tensorflow.keras.layers import LSTM, Dense, Dropout # type: ignore
 def lstm_train_predict(x_train, y_train, x_test):
 
     #scale the data
-    scaler_X = MinMaxScaler(feature_range=(0,1))
-    scaler_Y = MinMaxScaler(feature_range=(0,1))
+    scaler_X = MinMaxScaler(feature_range=(-1,1))
+    scaler_Y = MinMaxScaler(feature_range=(-1,1))
 
     X_train_scaled = scaler_X.fit_transform(x_train)
     X_test_scaled = scaler_X.transform(x_test)
@@ -21,24 +21,27 @@ def lstm_train_predict(x_train, y_train, x_test):
     X_test_scaled = X_test_scaled.reshape(X_test_scaled.shape[0], X_test_scaled.shape[1], 1)
 
     #create the LSTM model
-    model = Sequential()
-    #first LSTM layer
-    model.add(LSTM(100, activation = 'relu', return_sequences = True, input_shape = (X_train_scaled.shape[1], 1)))
-    model.add(Dropout(0.2))
-    #secons LSTM layer
-    model.add(LSTM(50, activation = 'relu', return_sequences = True))    
-    model.add(Dropout(0.2))
-    #third LSTM layer
-    model.add(LSTM(50, activation = 'relu'))
-    model.add(Dropout(0.2))
-    #output layer
-    model.add(Dense(1))
+    model = Sequential([
+        tf.keras.layers.Input(shape = (X_train_scaled.shape[1], 1)),
+        #first LSTM layer
+        LSTM(200, activation = 'relu', return_sequences = True),
+        Dropout(0.2),
+        #secons LSTM layer
+        LSTM(100, activation = 'relu', return_sequences = True), 
+        Dropout(0.2),
+        #third LSTM layer
+        LSTM(100, activation = 'relu'),
+        Dropout(0.2),
+        #output layer
+        Dense(1)
+    ])
+
     model.compile(optimizer = 'adam', loss = 'mse')
 
     early_stopping = EarlyStopping(monitor = 'val_loss', patience = 10, restore_best_weights = True)
 
     #fit/train the model
-    model.fit(X_train_scaled, Y_train_scaled, epochs = 100, batch_size = 32, validation_split = 0.2,callbacks = [early_stopping])
+    model.fit(X_train_scaled, Y_train_scaled, epochs = 250, batch_size = 128, validation_split = 0.2,callbacks = [early_stopping])
 
     #predict the data
     predictions_scaled = model.predict(X_test_scaled)
