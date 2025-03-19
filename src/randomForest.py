@@ -1,5 +1,5 @@
 import pandas as pd
-from sklearn.model_selection import train_test_split, RandomizedSearchCV
+from sklearn.model_selection import RandomizedSearchCV
 from sklearn.ensemble import RandomForestRegressor
 from scipy.stats import randint
 
@@ -11,7 +11,7 @@ def randomForest_train_predict(x_train, y_train, x_test):
     param_random = {
         'n_estimators' : randint(50,500),
         'max_depth' : randint(5, 50),
-        'max_features' : ['auto' ,'log2', 'sqrt' ],
+        'max_features' : ['log2', 'sqrt' ],
         'min_samples_split' : [2, 5, 10],
         'min_samples_leaf' : [1, 2, 4],
     }
